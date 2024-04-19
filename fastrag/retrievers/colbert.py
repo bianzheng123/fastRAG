@@ -38,6 +38,7 @@ class ColBERTRetriever(BaseRetriever):
         if filters:
             logger.info(f"Filters are not implemented for ColBERT/PLAID.")
 
+        print("retrieve------------------------------------")
         if top_k is None:
             top_k = self.top_k
 

@@ -12,6 +12,8 @@ with LazyImport(
 ) as colbert_import:
     from colbert import Indexer, Searcher
     from colbert.infra import ColBERTConfig, Run, RunConfig
+# from fastrag.stores.ColBERT.colbert import Indexer, Searcher
+# from fastrag.stores.ColBERT.colbert.infra import ColBERTConfig, Run, RunConfig
 
 
 logger = logging.getLogger(__name__)
@@ -51,7 +53,7 @@ class PLAIDDocumentStore(BaseDocumentStore):
         query_maxlen=60,
         kmeans_niters=4,
     ):
-        colbert_import.check()
+        # colbert_import.check()
         super().__init__()
         self.index_path = index_path
         self.checkpoint_path = checkpoint_path
@@ -168,6 +170,7 @@ class PLAIDDocumentStore(BaseDocumentStore):
 
         Returns: list of Haystack documents.
         """
+        print("--------------------------------query")
 
         doc_ids, _, scores = self.store.search(text=query_str, k=top_k)
 
