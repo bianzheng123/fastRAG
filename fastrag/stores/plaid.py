@@ -53,7 +53,7 @@ class PLAIDDocumentStore(BaseDocumentStore):
         query_maxlen=60,
         kmeans_niters=4,
     ):
-        # colbert_import.check()
+        colbert_import.check()
         super().__init__()
         self.index_path = index_path
         self.checkpoint_path = checkpoint_path
@@ -80,7 +80,7 @@ class PLAIDDocumentStore(BaseDocumentStore):
             RunConfig(index_root=self.index_path, nranks=self.ranks, gpus=self.gpus)
         ):
             self.store = Searcher(
-                index="", collection=self.collection_path, checkpoint=self.checkpoint_path
+                index=self.index_path, collection=self.collection_path, checkpoint=self.checkpoint_path
             )
 
         logger.info("Loaded PLAIDDocumentStore index")

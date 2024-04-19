@@ -8,7 +8,6 @@ class CandidateGeneration:
 
     def __init__(self, use_gpu=True):
         self.use_gpu = use_gpu
-        print("------------------------------------------------CandidateGeneration: use_gpu = ", use_gpu)
 
     def get_cells(self, Q, ncells):
         scores = (self.codec.centroids @ Q.T)
