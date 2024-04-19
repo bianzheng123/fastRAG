@@ -60,7 +60,6 @@ class Searcher:
 
     def search(self, text: str, k=10, filter_fn=None):
         Q = self.encode(text)
-        print(Q)
         self.config.total_visible_gpus = 0
         return self.dense_search(Q, k, filter_fn=filter_fn)
 

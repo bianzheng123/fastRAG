@@ -103,7 +103,7 @@ class PLAIDDocumentStore(BaseDocumentStore):
                 kmeans_niters=self.kmeans_niters,
             )
             indexer = Indexer(checkpoint=self.checkpoint_path, config=config)
-            indexer.index("", collection=self.collection_path, overwrite=True)
+            indexer.index(self.index_path, collection=self.collection_path, overwrite=True)
 
         logger.info("Created PLAIDDocumentStore Index.")
 
@@ -170,9 +170,8 @@ class PLAIDDocumentStore(BaseDocumentStore):
 
         Returns: list of Haystack documents.
         """
-        print("--------------------------------query")
 
-        doc_ids, _, scores = self.store.search(text=query_str, k=top_k)
+        doc_ids, _, scores, ivf_time_ms, filter_time_ms, refine_time_ms, n_refine_ivf, n_refine_filter = self.store.search(text=query_str, k=top_k)
 
         documents = [
             Document.from_dict(

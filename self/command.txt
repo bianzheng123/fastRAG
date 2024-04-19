@@ -1,5 +1,12 @@
+first, install the colbert
+change directory to colbert, the `pip install .`
+then install fastrag, change the directory to fastrag, the `pip install .`
+
+python3 self/process_colbert.py
+
 python3 scripts/indexing/create_plaid.py            \
-         --checkpoint /home/bianzheng/Dataset/vector-set-similarity-search/RawData/colbert-pretrain/colbertv2.0          \
-         --collection /home/bianzheng/fastRAG/data/collection/example-collection.tsv      \
-         --index-save-path ./data/index/example          \
+         --username bianzheng                      \
+         --dataset example                      \
          --gpu 1 --ranks 1
+
+proxychains python3 self/plaid_retrieval.py

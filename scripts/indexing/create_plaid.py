@@ -8,9 +8,9 @@ logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Create an index using PLAID engine as a backend")
-    parser.add_argument("--checkpoint", type=Path, required=True)
-    parser.add_argument("--collection", type=Path, required=True)
-    parser.add_argument("--index-save-path", type=Path, required=True)
+    parser.add_argument("--username", type=str, required=True)
+    parser.add_argument("--dataset", type=str, required=True)
+
     parser.add_argument("--gpus", type=int, default=0)
     parser.add_argument("--ranks", type=int, default=1)
     parser.add_argument("--doc-max-length", type=int, default=120)
@@ -28,10 +28,17 @@ if __name__ == "__main__":
     if args.gpus == 0:
         assert args.ranks > 0
 
+    username = args.username
+    dataset = args.dataset
+
+    checkpoint = f'/home/{username}/Dataset/vector-set-similarity-search/RawData/colbert-pretrain/colbertv2.0'
+    collection = f'/home/{username}/fastRAG/data/collection/{dataset}-collection.tsv'
+    index_save_path = f'/home/{username}/fastRAG/data/index/{dataset}'
+
     store = PLAIDDocumentStore(
-        index_path=f"{args.index_save_path}",
-        checkpoint_path=f"{args.checkpoint}",
-        collection_path=f"{args.collection}",
+        index_path=f"{index_save_path}",
+        checkpoint_path=f"{checkpoint}",
+        collection_path=f"{collection}",
         create=True,
         nbits=args.nbits,
         gpus=args.gpus,

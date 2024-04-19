@@ -55,7 +55,7 @@ class Indexer:
 
         return deleted
 
-    def index(self, name, collection, embedding_filename:str, overwrite=False):
+    def index(self, name, collection, overwrite=False):
         assert overwrite in [True, False, 'reuse', 'resume']
 
         self.configure(collection=collection, index_name=name, resume=overwrite=='resume')
@@ -71,15 +71,15 @@ class Indexer:
             self.erase()
 
         if index_does_not_exist or overwrite != 'reuse':
-            self.__launch(collection, embedding_filename)
+            self.__launch(collection)
 
         return self.index_path
 
-    def __launch(self, collection, embedding_filename:str):
+    def __launch(self, collection):
         manager = mp.Manager()
         shared_lists = [manager.list() for _ in range(self.config.nranks)]
         shared_queues = [manager.Queue(maxsize=1) for _ in range(self.config.nranks)]
 
         # Encodes collection into index using the CollectionIndexer class
         launcher = Launcher(encode)
-        launcher.launch(self.config, collection, embedding_filename, shared_lists, shared_queues)
+        launcher.launch(self.config, collection, shared_lists, shared_queues)

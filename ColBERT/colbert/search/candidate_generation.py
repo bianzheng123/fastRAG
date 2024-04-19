@@ -1,6 +1,7 @@
 import torch
 
 from colbert.search.strided_tensor import StridedTensor
+
 from .strided_tensor_core import _create_mask, _create_view
 
 
