@@ -6,9 +6,11 @@ import pandas as pd
 from haystack.document_stores import BaseDocumentStore
 from haystack.lazy_imports import LazyImport
 from haystack.schema import Document
+import torch
+import copy
 
 with LazyImport(
-    "Run 'pip install libs/colbert' from root dir to install ColBERT lib"
+        "Run 'pip install libs/colbert' from root dir to install ColBERT lib"
 ) as colbert_import:
     from colbert import Indexer, Searcher
     from colbert.infra import ColBERTConfig, Run, RunConfig
@@ -41,17 +43,18 @@ class PLAIDDocumentStore(BaseDocumentStore):
     """
 
     def __init__(
-        self,
-        index_path,
-        checkpoint_path,
-        collection_path,
-        create=False,
-        nbits=2,
-        gpus=0,
-        ranks=1,
-        doc_maxlen=120,
-        query_maxlen=60,
-        kmeans_niters=4,
+            self,
+            index_path,
+            checkpoint_path,
+            collection_path,
+            retrieval_config: dict,
+            create=False,
+            nbits=2,
+            gpus=0,
+            ranks=1,
+            doc_maxlen=120,
+            query_maxlen=60,
+            kmeans_niters=4,
     ):
         colbert_import.check()
         super().__init__()
@@ -72,15 +75,23 @@ class PLAIDDocumentStore(BaseDocumentStore):
             collection_path, sep="\t" if collection_path.endswith(".tsv") else ",", header=None
         )
         self.titles = len(self.docs.columns) > 2
-        self._load_index()
+        self._load_index(retrieval_config=retrieval_config)
 
-    def _load_index(self):
+    def _load_index(self, retrieval_config: dict):
         """Load PLAID index from the paths given to the class and initialize a Searcher object."""
+        if 'n_thread' in retrieval_config:
+            torch.set_num_threads(retrieval_config['n_thread'])
+        colbert_retrieval_config = copy.deepcopy(retrieval_config)
+        if 'n_thread' in retrieval_config:
+            del colbert_retrieval_config['n_thread']
         with Run().context(
-            RunConfig(index_root=self.index_path, nranks=self.ranks, gpus=self.gpus)
+                RunConfig(index_root=self.index_path, nranks=self.ranks, gpus=self.gpus)
         ):
+            config = ColBERTConfig(
+                **colbert_retrieval_config
+            )
             self.store = Searcher(
-                index=self.index_path, collection=self.collection_path, checkpoint=self.checkpoint_path
+                index=self.index_path, collection=self.collection_path, checkpoint=self.checkpoint_path, config=config
             )
 
         logger.info("Loaded PLAIDDocumentStore index")
@@ -94,7 +105,7 @@ class PLAIDDocumentStore(BaseDocumentStore):
         """
 
         with Run().context(
-            RunConfig(index_root=self.index_path, nranks=self.ranks, gpus=self.gpus)
+                RunConfig(index_root=self.index_path, nranks=self.ranks, gpus=self.gpus)
         ):
             config = ColBERTConfig(
                 doc_maxlen=self.doc_maxlen,
@@ -171,7 +182,8 @@ class PLAIDDocumentStore(BaseDocumentStore):
         Returns: list of Haystack documents.
         """
 
-        doc_ids, _, scores, ivf_time_ms, filter_time_ms, refine_time_ms, n_refine_ivf, n_refine_filter = self.store.search(text=query_str, k=top_k)
+        doc_ids, _, scores, ivf_time_ms, filter_time_ms, refine_time_ms, n_refine_ivf, n_refine_filter = self.store.search(
+            text=query_str, k=top_k)
 
         documents = [
             Document.from_dict(

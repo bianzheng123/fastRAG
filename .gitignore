@@ -136,3 +136,4 @@ dmypy.json
 /__main__
 
 .DS_Store
+/data/

@@ -2,11 +2,16 @@ first, install the colbert
 change directory to colbert, the `pip install .`
 then install fastrag, change the directory to fastrag, the `pip install .`
 
+first test running the colbert in wikipedia-500, then show the final running result
+
 python3 self/process_colbert.py
 
 python3 scripts/indexing/create_plaid.py            \
          --username bianzheng                      \
-         --dataset example                      \
+         --dataset wikipedia-500                    \
+         --doc-max-length 180                      \
+         --query-max-length 60                      \
+         --kmeans-iterations 20                     \
          --gpu 1 --ranks 1
 
 proxychains python3 self/plaid_retrieval.py

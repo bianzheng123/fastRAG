@@ -39,6 +39,7 @@ if __name__ == "__main__":
         index_path=f"{index_save_path}",
         checkpoint_path=f"{checkpoint}",
         collection_path=f"{collection}",
+        retrieval_config={},
         create=True,
         nbits=args.nbits,
         gpus=args.gpus,
