@@ -34,7 +34,7 @@ class Checkpoint(ColBERT):
         with torch.no_grad():
             with self.amp_manager.context():
                 D = super().doc(*args, **kw_args)
-
+                # print(f"doc to_cpu {to_cpu}, is_variable gpu {D[0].device}")
                 if to_cpu:
                     return (D[0].cpu(), *D[1:]) if isinstance(D, tuple) else D.cpu()
 

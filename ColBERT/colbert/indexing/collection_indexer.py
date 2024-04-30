@@ -29,9 +29,9 @@ from colbert.utils.utils import flatten, print_message
 from colbert.indexing.codecs.residual import ResidualCodec
 
 
-def encode(config, collection, shared_lists, shared_queues):
+def encode(config, collection, embedding_filename, shared_lists, shared_queues):
     encoder = CollectionIndexer(config=config, collection=collection)
-    encoder.run(shared_lists)
+    encoder.run(embedding_filename, shared_lists)
 
 
 class CollectionIndexer():
@@ -59,7 +59,7 @@ class CollectionIndexer():
 
         print_memory_stats(f'RANK:{self.rank}')
 
-    def run(self, shared_lists):
+    def run(self, embedding_filename, shared_lists):
         with torch.inference_mode():
             self.setup()  # Computes and saves plan for whole collection
             distributed.barrier(self.rank)
@@ -70,7 +70,7 @@ class CollectionIndexer():
             distributed.barrier(self.rank)
             print_memory_stats(f'RANK:{self.rank}')
 
-            self.index()  # Encodes and saves all tokens into residuals
+            self.index(embedding_filename)  # Encodes and saves all tokens into residuals
             distributed.barrier(self.rank)
             print_memory_stats(f'RANK:{self.rank}')
 
@@ -273,7 +273,7 @@ class CollectionIndexer():
 
         do_fork_for_faiss = False  # set to True to free faiss GPU-0 memory at the cost of one more copy of `sample`.
 
-        args_ = [self.config.dim, self.num_partitions, self.config.kmeans_niters]
+        args_ = [self.config.dim, self.num_partitions, self.config.kmeans_niters, self.use_gpu]
 
         if do_fork_for_faiss:
             # For this to work reliably, write the sample to disk. Pickle may not handle >4GB of data.
@@ -333,7 +333,7 @@ class CollectionIndexer():
         # sample_reconstruct = get_centroids_for(centroids, sample)
         # sample_avg_residual = (sample - sample_reconstruct).mean(dim=0)
 
-    def index(self):
+    def index(self, embedding_filename):
         '''
         Encode embeddings for all passages in collection.
         Each embedding is converted to code (centroid id) and residual.
@@ -352,6 +352,16 @@ class CollectionIndexer():
                     continue
                 # Encode passages into embeddings with the checkpoint model
                 embs, doclens = self.encoder.encode_passages(passages)
+
+                # BEGIN INSERTED CODE:
+                # FOLDER = < insert your folder here >
+                # @bianzheng
+                import numpy as np
+                numpy_32 = embs.numpy().astype("float32")
+                np.save(os.path.join(embedding_filename, f"encoding{chunk_idx}_float32.npy"), numpy_32)
+                np.save(os.path.join(embedding_filename, f"doclens{chunk_idx}.npy"), doclens)
+                print(f'save embeddings chunkID {chunk_idx}')
+                # END INSERTED CODE
 
                 if self.use_gpu:
                     assert embs.dtype == torch.float16
@@ -479,8 +489,7 @@ class CollectionIndexer():
             f.write(ujson.dumps(d, indent=4) + '\n')
 
 
-def compute_faiss_kmeans(dim, num_partitions, kmeans_niters, shared_lists, return_value_queue=None):
-    use_gpu = torch.cuda.is_available()
+def compute_faiss_kmeans(dim, num_partitions, kmeans_niters, use_gpu, shared_lists, return_value_queue=None):
     kmeans = faiss.Kmeans(dim, num_partitions, niter=kmeans_niters, gpu=use_gpu, verbose=True, seed=123)
 
     sample = shared_lists[0][0]

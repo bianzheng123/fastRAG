@@ -24,7 +24,8 @@ class CollectionEncoder():
             # But ideally this batching happens internally inside docFromText.
             for passages_batch in batch(passages, self.config.bsize * 50):
                 embs_, doclens_ = self.checkpoint.docFromText(passages_batch, bsize=self.config.bsize,
-                                                              keep_dims='flatten', showprogress=(not self.use_gpu))
+                                                              keep_dims='flatten', showprogress=(not self.use_gpu),
+                                                              to_cpu=False)
                 embs.append(embs_)
                 doclens.extend(doclens_)
 

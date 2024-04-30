@@ -23,7 +23,7 @@ class IndexLoader:
 
     def _load_codec(self):
         print_message(f"#> Loading codec...")
-        self.codec = ResidualCodec.load(self.index_path)
+        self.codec = ResidualCodec.load(self.index_path, is_build_index=False)
 
     def _load_ivf(self):
         print_message(f"#> Loading IVF...")

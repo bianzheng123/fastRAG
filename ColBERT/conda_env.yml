@@ -1,4 +1,4 @@
-name: sim_search
+name: fastRAG
 channels:
   - pytorch
   - nvidia

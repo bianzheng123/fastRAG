@@ -2,16 +2,45 @@ first, install the colbert
 change directory to colbert, the `pip install .`
 then install fastrag, change the directory to fastrag, the `pip install .`
 
+you may need to check if the correct pip directory is installed
+
 first test running the colbert in wikipedia-500, then show the final running result
 
 python3 self/process_colbert.py
 
 python3 scripts/indexing/create_plaid.py            \
-         --username bianzheng                      \
+         --username zhengbian                      \
          --dataset wikipedia-500                    \
          --doc-max-length 180                      \
          --query-max-length 60                      \
          --kmeans-iterations 20                     \
          --gpu 1 --ranks 1
 
+python3 scripts/indexing/create_plaid.py            \
+         --username zhengbian                      \
+         --dataset lotte-lifestyle                    \
+         --doc-max-length 180                      \
+         --query-max-length 60                      \
+         --kmeans-iterations 20                     \
+         --gpu 1 --ranks 1
+
+python3 scripts/indexing/create_plaid.py            \
+         --username zhengbian                      \
+         --dataset wikipedia                    \
+         --doc-max-length 180                      \
+         --query-max-length 60                      \
+         --kmeans-iterations 20                     \
+         --gpu 1 --ranks 1
+
+nohup python3 -u scripts/indexing/create_plaid.py            \
+                           --username zhengbian                      \
+                           --dataset wikipedia                    \
+                           --doc-max-length 180                      \
+                           --query-max-length 60                      \
+                           --kmeans-iterations 20                     \
+                           --gpu 1 --ranks 1 > out.log 2>&1 &
+
+
 proxychains python3 self/plaid_retrieval.py
+
+nohup proxychains python3 -u self/plaid_retrieval.py > out.log 2>&1 &

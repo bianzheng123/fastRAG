@@ -31,7 +31,8 @@ if __name__ == "__main__":
     username = args.username
     dataset = args.dataset
 
-    checkpoint = f'/home/{username}/Dataset/vector-set-similarity-search/RawData/colbert-pretrain/colbertv2.0'
+    # checkpoint = f'/home/{username}/Dataset/vector-set-similarity-search/RawData/colbert-pretrain/colbertv2.0'
+    checkpoint = f'/home/{username}/Dataset/vector-set-similarity-search/RawData/colbert-pretrain/intel-colbert-nq'
     collection = f'/home/{username}/fastRAG/data/collection/{dataset}-collection.tsv'
     index_save_path = f'/home/{username}/fastRAG/data/index/{dataset}'
 

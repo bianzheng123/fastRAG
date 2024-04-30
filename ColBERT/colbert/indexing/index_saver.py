@@ -18,11 +18,11 @@ class IndexSaver():
         codec.save(index_path=self.config.index_path_)
 
     def load_codec(self):
-        return ResidualCodec.load(index_path=self.config.index_path_)
+        return ResidualCodec.load(index_path=self.config.index_path_, is_build_index=True)
 
     def try_load_codec(self):
         try:
-            ResidualCodec.load(index_path=self.config.index_path_)
+            ResidualCodec.load(index_path=self.config.index_path_, is_build_index=True)
             return True
         except Exception as e:
             return False

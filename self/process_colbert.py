@@ -17,6 +17,6 @@ def process_colbert(username: str, dataset: str):
 
 
 if __name__ == '__main__':
-    username = 'bianzheng'
-    dataset = 'wikipedia-500'
+    username = 'zhengbian'
+    dataset = 'lotte-lifestyle'
     process_colbert(username=username, dataset=dataset)

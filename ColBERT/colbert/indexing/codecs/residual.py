@@ -132,9 +132,10 @@ class ResidualCodec:
         cls.loaded_extensions = True
 
     @classmethod
-    def load(cls, index_path):
+    def load(cls, index_path, is_build_index):
         config = ColBERTConfig.load_from_index(index_path)
-        config.total_visible_gpus = 0
+        if not is_build_index:
+            config.total_visible_gpus = 0
         centroids_path = os.path.join(index_path, 'centroids.pt')
         avgresidual_path = os.path.join(index_path, 'avg_residual.pt')
         buckets_path = os.path.join(index_path, 'buckets.pt')

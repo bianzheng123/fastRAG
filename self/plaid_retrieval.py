@@ -23,6 +23,7 @@ def load_pipeline(username: str, dataset: str, retrieval_config: dict):
 
     '''define retriever'''
     store = PLAIDDocumentStore(index_path=index_path,
+                               # checkpoint_path="colbert-ir/colbertv2.0",
                                checkpoint_path="Intel/ColBERT-NQ",
                                collection_path=collection_path,
                                retrieval_config=retrieval_config,
@@ -168,16 +169,22 @@ if __name__ == '__main__':
             'username': 'zhengbian',
             # 'dataset_l': ['lotte', 'msmacro'],
             # 'dataset_l': ['lotte-lifestyle', 'lotte', 'msmacro'],
+            # 'dataset_l': ['wikipedia-500'],
             'dataset_l': ['wikipedia'],
             'topk_l': [10],
             'retrieval_parameter_l': [
-                {"ndocs": 128, "ncells": 1, "centroid_score_threshold": 0.5, "n_thread": 1},
+                # {"ndocs": 128, "ncells": 1, "centroid_score_threshold": 0.5, "n_thread": 1},
+                {'ndocs': 32, 'ncells': 64, 'centroid_score_threshold': 0.5, "n_thread": 1},
+                {'ndocs': 128, 'ncells': 64, 'centroid_score_threshold': 0.5, "n_thread": 1},
+                {'ndocs': 512, 'ncells': 64, 'centroid_score_threshold': 0.5, "n_thread": 1}
             ],
             'grid_search': True,
             'grid_search_para': {
                 # 'ndocs': [4 * 100, 4 * 200, 4 * 300, 4 * 400, 4 * 500, 4 * 600, 4 * 700, 4 * 800, 4 * 900, 4 * 1000],
                 'ndocs': [4 * 10, 4 * 50, 4 * 100, 4 * 200, 4 * 400, 4 * 800],
                 'ncells': [1, 2],
+                # 'ndocs': [4 * 800],
+                # 'ncells': [2],
                 'centroid_score_threshold': [0.5],
                 'n_thread': [1]
             }
@@ -201,7 +208,7 @@ if __name__ == '__main__':
             }
         }
     }
-    host_name = 'local'
+    host_name = 'dbg'
 
     config = config_l[host_name]
     username = config['username']
